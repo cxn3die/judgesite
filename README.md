@@ -12,10 +12,23 @@ materialy/              статьи адвокатов и юристов
 dokumenty/              политика, положение и согласие по 152-ФЗ
 assets/style.css        все стили (дизайн-система в :root)
 assets/site.js          мобильное меню и форма заявки → Telegram
-assets/fonts/           Spectral и Golos Text (локально, без Google Fonts)
+assets/fonts/           Onest (вариативный, локально, без Google Fonts)
 assets/img/             фото, эмблема, favicon, og.png (превью для Telegram и соцсетей)
+tools/build.py          сборщик страниц из общего шаблона (данные услуг, команды и статей внутри)
+tools/old_articles.json кэш исходных текстов статей для сборщика
 sitemap.xml, robots.txt
 ```
+
+## Пересборка страниц
+
+Все страницы генерируются из `tools/build.py`: шапка, подвал, услуги, карточки команды и статьи
+описаны там один раз. После правки данных или шаблона выполните из корня:
+
+```
+python3 -I tools/build.py "$PWD"
+```
+
+Стили (`assets/style.css`) и скрипт (`assets/site.js`) сборщик не трогает, их правят напрямую.
 
 ## Локальный просмотр
 

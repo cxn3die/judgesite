@@ -54,6 +54,10 @@
   if (form) {
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+      if (typeof form.checkValidity === 'function' && !form.checkValidity()) {
+        if (form.reportValidity) form.reportValidity();
+        return;
+      }
       var name = (document.getElementById('f-name').value || '').trim();
       var phone = (document.getElementById('f-phone').value || '').trim();
       var message = (document.getElementById('f-message').value || '').trim();
