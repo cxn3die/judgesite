@@ -116,24 +116,18 @@
       if (!w || !h) return;
       r.w = w; r.h = h;
       r.svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
-      var narrow = w <= 860, scale, d;
-      if (narrow) {
-        // Телефон: колонки стоят друг под другом, волна пересекала бы текст.
-        // Вместо неё ровная строка между блоком направления и списком услуг.
-        var head = r.sec.querySelector('.svc-head');
-        var y = head ? head.getBoundingClientRect().bottom - r.sec.getBoundingClientRect().top + 30 : h * 0.2;
-        d = 'M-40,' + Math.round(y) + ' L' + (w + 40) + ',' + Math.round(y);
-        scale = 0.36;
-      } else {
-        // Волна: из-под левого блока вверх, над списком вниз, у правого края снова вверх
-        var pts = [[-160, h * 0.8], [w * 0.2, h * 0.56], [w * 0.44, h * 0.12], [w * 0.62, h * 0.5], [w * 0.76, h * 0.88], [w * 0.9, h * 0.6], [w + 160, h * 0.26]];
-        d = spline(pts);
-        scale = Math.max(0.7, Math.min(1, w / 1200));
-      }
-      r.path.setAttribute('d', d);
-      var len = r.path.getTotalLength();
       var tp = r.tp;
       while (tp.firstChild) tp.removeChild(tp.firstChild);
+      if (w <= 860) {
+        // Телефон и планшет: колонки стоят друг под другом, лента не нужна
+        r.unit = 0;
+        return;
+      }
+      // Волна: из-под левого блока вверх, над списком вниз, у правого края снова вверх
+      var pts = [[-160, h * 0.8], [w * 0.2, h * 0.56], [w * 0.44, h * 0.12], [w * 0.62, h * 0.5], [w * 0.76, h * 0.88], [w * 0.9, h * 0.6], [w + 160, h * 0.26]];
+      r.path.setAttribute('d', spline(pts));
+      var len = r.path.getTotalLength();
+      var scale = Math.max(0.7, Math.min(1, w / 1200));
       function addUnit() {
         r.laws.forEach(function (law, i) {
           var ts = document.createElementNS(NS, 'tspan');

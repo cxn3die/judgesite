@@ -489,7 +489,7 @@ body.menu-open .mobile-menu{display:block;}
   .svc-grid{grid-template-columns:1fr;gap:18px;}
   .svc-head{position:static;margin:0 calc(-1 * var(--gutter));padding:18px var(--gutter) 20px;border-radius:0;}
   .svc-art{display:none;}
-  .svc[data-laws] .svc-side{padding-bottom:48px;}
+  .law-ribbon{display:none;}
   .svc,.svc-item{scroll-margin-top:124px;}
 }
 
