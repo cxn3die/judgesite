@@ -1,6 +1,20 @@
 (function () {
   'use strict';
 
+  /* Новая страница открывается с начала ------------------------------
+     Без этого при показе сайта внутри фрейма (превью, встраивание)
+     внешняя прокрутка остаётся на месте и страница открывается «посередине».
+     Не трогаем переходы по якорю, возврат «назад» и перезагрузку. */
+  (function () {
+    if (location.hash) return;
+    var nav = window.performance && performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+    if (nav && nav.type !== 'navigate') return;
+    try {
+      window.scrollTo(0, 0);
+      document.body.scrollIntoView({ block: 'start', behavior: 'instant' });
+    } catch (e) { /* старые браузеры: достаточно scrollTo */ }
+  })();
+
   /* Мобильное меню ------------------------------------------------- */
   var body = document.body;
   var btn = document.querySelector('.menu-btn');
