@@ -111,6 +111,7 @@ strong{font-weight:600;}
 .band-dark .btn-ghost:hover,.band-dark-2 .btn-ghost:hover,.panel-dark .btn-ghost:hover,.article-cta .btn-ghost:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.5);color:#fff;}
 .btn-sm{padding:11px 18px;font-size:0.88rem;}
 .actions{display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+@media (max-width:480px){ .actions{flex-direction:column;align-items:stretch;gap:10px;} .actions .btn{width:100%;} }
 
 /* Шапка --------------------------------------------------------------- */
 .site-header{
@@ -194,7 +195,12 @@ body.menu-open .mobile-menu{display:block;}
 .rows h3{font-size:1.15rem;font-weight:600;letter-spacing:-0.01em;}
 .rows p{color:var(--ink-2);font-size:1rem;line-height:1.6;}
 .rows .sep{color:var(--gold-700);margin:0 8px;}
-@media (max-width:700px){ .rows li{grid-template-columns:1fr;padding:20px 0;} }
+@media (max-width:700px){
+  .rows li{grid-template-columns:1fr;padding:20px 0;gap:8px;}
+  .rows p{display:flex;flex-direction:column;gap:7px;}
+  .rows .sep{display:none;}
+  .rows p a{display:block;}
+}
 
 /* Команда ------------------------------------------------------------- */
 .team-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:28px 24px;}
@@ -219,7 +225,16 @@ body.menu-open .mobile-menu{display:block;}
 /* Каталог (адвокаты, юристы) ------------------------------------------- */
 .directory{display:grid;grid-template-columns:repeat(3,1fr);gap:32px 28px;}
 @media (max-width:900px){ .directory{grid-template-columns:repeat(2,1fr);} }
-@media (max-width:560px){ .directory{grid-template-columns:1fr;} }
+@media (max-width:560px){
+  /* телефон: портрет слева, текст справа, чтобы карточка не занимала полтора экрана */
+  .directory{grid-template-columns:1fr;gap:22px;}
+  .directory .person{display:grid;grid-template-columns:112px 1fr;gap:4px 16px;align-items:start;}
+  .directory .portrait{grid-row:1 / span 5;}
+  .directory .person-name{grid-column:2;font-size:1.1rem;margin-top:0;}
+  .directory .person-role{grid-column:2;font-size:0.78rem;}
+  .directory .person-desc{grid-column:2;font-size:0.88rem;margin-top:4px;}
+  .directory .person-more{grid-column:2;margin-top:6px;}
+}
 .directory .person-name{font-size:1.3rem;margin-top:20px;}
 .directory .person-more{display:inline-flex;align-items:center;gap:8px;margin-top:14px;font-size:0.88rem;font-weight:600;color:var(--gold-700);}
 .directory .person-more .arr{transition:transform .2s;}
@@ -281,8 +296,9 @@ body.menu-open .mobile-menu{display:block;}
 .contact-list .arr{color:var(--gold-700);}
 @media (max-width:820px){
   .profile{grid-template-columns:1fr;}
-  .profile-side{position:static;max-width:380px;}
+  .profile-side{position:static;max-width:300px;}
 }
+@media (max-width:480px){ .profile-side{max-width:240px;} }
 
 /* Списки статей ------------------------------------------------------- */
 .article-list{list-style:none;border-top:1px solid var(--line);}
