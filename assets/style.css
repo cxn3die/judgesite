@@ -401,6 +401,37 @@ body.menu-open .mobile-menu{display:block;}
 .fill{background:var(--light-2);border-bottom:1px dashed var(--gold-700);padding:0 4px;font-weight:600;color:var(--ink);}
 .draft-note{border-left:3px solid var(--gold-700);padding:12px 18px;margin-bottom:36px;font-size:0.88rem;color:var(--ink-2);line-height:1.55;background:var(--light-2);}
 
+/* Направления на главной: кликабельные фразы ---------------------------- */
+.rows h3 a{transition:color .2s;}
+.rows h3 a:hover{color:var(--gold-700);}
+.rows p a{border-bottom:1px solid var(--line);transition:color .2s,border-color .2s;}
+.rows p a:hover{color:var(--gold-700);border-color:var(--gold-700);}
+
+/* Страница услуг --------------------------------------------------------- */
+.subnav{position:sticky;top:76px;z-index:40;background:var(--black-2);border-bottom:1px solid var(--line-dark);}
+.subnav .wrap{display:flex;gap:28px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;}
+.subnav .wrap::-webkit-scrollbar{display:none;}
+.subnav a{flex-shrink:0;padding:16px 0;font-size:0.88rem;font-weight:500;color:var(--on-dark-2);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .2s,border-color .2s;}
+.subnav a:hover{color:#fff;border-color:var(--gold-500);}
+.svc{scroll-margin-top:136px;}
+.svc-grid{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:32px clamp(40px,6vw,96px);align-items:start;}
+.svc-head{position:sticky;top:150px;}
+.svc-head h2{font-size:clamp(1.5rem,1.15rem + 1.3vw,2.1rem);margin-bottom:14px;}
+.svc-head .lead{font-size:1.02rem;}
+.svc-list{list-style:none;border-top:1px solid var(--line);}
+.svc-item{padding:24px 0 26px;border-bottom:1px solid var(--line);scroll-margin-top:150px;transition:background .4s;}
+.svc-item h3{font-size:1.12rem;margin-bottom:8px;letter-spacing:-0.01em;}
+.svc-item p{color:var(--ink-2);font-size:0.98rem;line-height:1.6;max-width:62ch;}
+.svc-item:target{background:linear-gradient(90deg,rgba(166,135,63,0.14),transparent 70%);box-shadow:inset 3px 0 0 var(--gold-700);padding-left:18px;}
+.svc-item:target h3{color:var(--gold-900);}
+.band-light-2 .svc-list,.band-light-2 .svc-item{border-color:#CFCBC1;}
+@media (max-width:860px){
+  .svc-grid{grid-template-columns:1fr;gap:20px;}
+  .svc-head{position:static;}
+  .svc,.svc-item{scroll-margin-top:130px;}
+}
+.svc-cta{margin-top:0;}
+
 /* Служебное ----------------------------------------------------------- */
 .back-link{display:inline-flex;align-items:center;gap:8px;margin-top:40px;font-size:0.9rem;color:var(--muted);}
 .back-link:hover{color:var(--gold-700);}
