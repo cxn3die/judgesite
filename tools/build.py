@@ -589,10 +589,21 @@ def uslugi_index():
 # ---------------------------------------------------------------------------
 # Главная
 # ---------------------------------------------------------------------------
+def services_count(n):
+    """«4 услуги», «5 услуг», «1 услуга»: подпись под направлением на телефоне."""
+    if n % 10 == 1 and n % 100 != 11:
+        word = 'услуга'
+    elif n % 10 in (2, 3, 4) and n % 100 not in (12, 13, 14):
+        word = 'услуги'
+    else:
+        word = 'услуг'
+    return f'{n} {word}'
+
+
 def home():
     root = ''
     svc = '\n'.join(f'''  <li>
-    <h3><a href="uslugi/#{s['id']}">{s['title']}</a></h3>
+    <h3><a href="uslugi/#{s['id']}"><span class="name">{s['title']}</span><span class="cnt">{services_count(len(s['items']))}</span></a></h3>
     <p>{' '.join(f'<a href="uslugi/#{iid}" data-text="{t}{"," if i < len(s["items"]) - 1 else ""}">{t}{"<span class=\"sep\">,</span>" if i < len(s["items"]) - 1 else ""}</a>' for i, (iid, t, _) in enumerate(s['items']))}</p>
   </li>''' for s in SERVICES)
     team = '\n'.join(person_card(root, k) for k in ['simkin', 'chinokalov', 'truevtsev', 'bakoyan', 'shitov'])
@@ -653,7 +664,7 @@ def home():
   <div class="wrap">
     <div class="band-head">
       <h2>Материалы</h2>
-      <p class="lead">Обыск и задержание, ответы банку по 115-ФЗ, как устроен НДС. Пишут адвокаты и юристы агентства.</p>
+      <p class="lead">Пишут адвокаты и юристы агентства.</p>
     </div>
 {latest}
     <div class="team-links">
