@@ -465,9 +465,16 @@ body.menu-open .mobile-menu{display:block;}
 .subnav a{flex-shrink:0;padding:14px 0;font-size:var(--t-sm);font-weight:400;color:var(--on-dark-2);border-bottom:1px solid transparent;margin-bottom:-1px;transition:color .2s,border-color .2s;}
 .subnav a:hover{color:#fff;border-color:var(--gold-500);}
 @media (max-width:980px){ .subnav{top:64px;} }
-.svc{scroll-margin-top:128px;}
-.svc-grid{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:28px clamp(40px,6vw,96px);align-items:start;}
-.svc-head{position:sticky;top:140px;padding:24px 26px 26px;background:var(--light-2);border-radius:var(--radius);}
+.svc{scroll-margin-top:128px;position:relative;}
+.svc-grid{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:28px clamp(40px,6vw,96px);align-items:start;position:relative;z-index:1;}
+.svc-side{align-self:stretch;position:relative;}
+.svc-head{position:sticky;top:140px;z-index:2;padding:24px 26px 26px;background:var(--light-2);border-radius:var(--radius);}
+/* Иллюстрация под липким блоком: при прокрутке блок «съедает» её сверху */
+.svc-art{display:block;position:relative;z-index:1;width:100%;height:auto;margin-top:28px;}
+/* Лента со статьями законов: SVG-текст по волне за содержимым, рисуется в site.js */
+.law-ribbon{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;user-select:none;}
+.law-ribbon text{fill:var(--gold-700);fill-opacity:0.18;font-family:var(--sans);font-weight:500;letter-spacing:0.02em;font-variant-numeric:tabular-nums;}
+.band-light-2 .law-ribbon text{fill-opacity:0.21;}
 .band-light-2 .svc-head{background:#DFDCD4;}
 .svc-head h2{font-size:clamp(1.3rem,1.05rem + 1vw,1.75rem);margin-bottom:12px;}
 .svc-head .lead{font-size:var(--t-base);}
@@ -481,6 +488,8 @@ body.menu-open .mobile-menu{display:block;}
 @media (max-width:860px){
   .svc-grid{grid-template-columns:1fr;gap:18px;}
   .svc-head{position:static;margin:0 calc(-1 * var(--gutter));padding:18px var(--gutter) 20px;border-radius:0;}
+  .svc-art{display:none;}
+  .svc[data-laws] .svc-side{padding-bottom:48px;}
   .svc,.svc-item{scroll-margin-top:124px;}
 }
 
