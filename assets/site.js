@@ -7,12 +7,19 @@
      Не трогаем переходы по якорю, возврат «назад» и перезагрузку. */
   (function () {
     if (location.hash) return;
+    var framed = false;
+    try { framed = window.top !== window.self; } catch (e) { framed = true; }
+    if (!framed) return;
     var nav = window.performance && performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
-    if (nav && nav.type !== 'navigate') return;
-    try {
-      window.scrollTo(0, 0);
-      document.body.scrollIntoView({ block: 'start', behavior: 'instant' });
-    } catch (e) { /* старые браузеры: достаточно scrollTo */ }
+    if (nav && nav.type === 'back_forward') return;
+    function toTop() {
+      try { window.scrollTo(0, 0); } catch (e) {}
+      try { var t = document.getElementById('top'); if (t) t.scrollIntoView({ block: 'start' }); } catch (e) {}
+    }
+    toTop();
+    // Переход по якорю браузер прокручивает сквозь границы фреймов: «#top» указывает на шапку.
+    try { if (!location.hash) location.replace(location.pathname + location.search + '#top'); } catch (e) {}
+    window.addEventListener('load', function () { toTop(); setTimeout(toTop, 300); });
   })();
 
   /* Мобильное меню ------------------------------------------------- */
