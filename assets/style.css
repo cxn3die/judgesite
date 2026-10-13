@@ -404,8 +404,10 @@ body.menu-open .mobile-menu{display:block;}
 /* Направления на главной: кликабельные фразы ---------------------------- */
 .rows h3 a{transition:color .2s;}
 .rows h3 a:hover{color:var(--gold-700);}
-.rows p a{border-bottom:1px solid var(--line);transition:color .2s,border-color .2s;}
-.rows p a:hover{color:var(--gold-700);border-color:var(--gold-700);}
+/* без подчёркивания; по наведению жирнее, ширина зарезервирована под жирный текст, чтобы строка не прыгала */
+.rows p a{display:inline-block;text-align:left;transition:color .15s;}
+.rows p a::after{content:attr(data-text);display:block;height:0;overflow:hidden;visibility:hidden;font-weight:600;}
+.rows p a:hover{font-weight:600;color:var(--ink);}
 
 /* Страница услуг --------------------------------------------------------- */
 .subnav{position:sticky;top:76px;z-index:40;background:var(--black-2);border-bottom:1px solid var(--line-dark);}
