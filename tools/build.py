@@ -628,7 +628,6 @@ def home():
         <li><span class="k">Адрес</span><span class="v">{ADDR}</span></li>
         <li><span class="k">Часы</span><span class="v">{HOURS}</span></li>
         <li><span class="k">Telegram</span><span class="v"><a href="{TG}" target="_blank" rel="noopener">@Capital_Defence</a></span></li>
-        <li><span class="k">Команда</span><span class="v">3 адвоката, 2 юриста, медиатор</span></li>
       </ul>
       <p class="hero-note">Принимаем в офисе на проспекте Победы. С другими городами работаем удалённо.</p>
     </aside>
