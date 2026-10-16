@@ -75,7 +75,7 @@ def shell(*, root, path, title, description, body, active=None, ld=None, og_type
 <link rel="icon" href="{root}favicon.ico" sizes="32x32">
 <link rel="icon" href="{root}assets/img/favicon-32.png" type="image/png">
 <link rel="apple-touch-icon" href="{root}assets/img/apple-touch-icon.png">
-<link rel="stylesheet" href="{root}assets/style.css">
+<link rel="stylesheet" href="{root}assets/style.css?v=20261014-cta">
 <script src="{root}assets/site.js" defer></script>
 {ld_html}
 </head>
@@ -93,7 +93,7 @@ def shell(*, root, path, title, description, body, active=None, ld=None, og_type
     </nav>
     <div class="header-actions">
       <a class="header-phone" href="tel:{PHONE_TEL}">{PHONE}</a>
-      <a class="btn btn-sm" href="{root}#contact">Консультация</a>
+      <a class="btn btn-gold btn-sm" href="{root}#contact">Консультация</a>
       <button class="menu-btn" type="button" aria-label="Меню" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
     </div>
   </div>
@@ -172,7 +172,9 @@ def contact_list(items):
     out = ['<ul class="contact-list">']
     for icon, k, v, href, ext in items:
         extra = ' target="_blank" rel="noopener"' if ext else ''
-        out.append(f'  <li><a href="{href}"{extra}>{ICON[icon]}<span><span class="k">{k}</span><span class="v">{v}</span></span></a></li>')
+        cls = ' class="contact-action contact-action-primary"' if icon == 'phone' else (' class="contact-action"' if icon == 'send' else '')
+        label = ('Позвонить в офис' if 'офис' in k.lower() else 'Позвонить лично') if icon == 'phone' else ('Написать в Telegram' if icon == 'send' else k)
+        out.append(f'  <li><a{cls} href="{href}"{extra}>{ICON[icon]}<span><span class="k">{label}</span><span class="v">{v}</span></span></a></li>')
     out.append('</ul>')
     return '\n'.join(out)
 
@@ -550,6 +552,7 @@ def uslugi_index():
     <div class="svc-head">
       <h2>{s['title']}</h2>
       <p class="lead">{s['intro']}</p>
+      <a class="btn btn-gold" href="{root}#contact">Обсудить ситуацию</a>
     </div>
     <ul class="svc-list">
 {items}
@@ -616,7 +619,7 @@ def home():
       <p class="lead">Уголовные дела, налоги, банкротство, споры с банками, разблокировка счетов, защита бизнеса, семейные споры, представительство в суде. Первый разбор ситуации бесплатный: после него вы понимаете, что делать и с кем.</p>
       <div class="actions">
         <a class="btn btn-gold" href="#contact">Записаться на консультацию</a>
-        <a class="text-link" href="{TG}" target="_blank" rel="noopener">Написать в Telegram</a>
+        <a class="btn btn-ghost" href="{TG}" target="_blank" rel="noopener">Написать в Telegram</a>
       </div>
     </div>
     <aside class="hero-aside">
@@ -625,7 +628,6 @@ def home():
         <li><span class="k">Адрес</span><span class="v">{ADDR}</span></li>
         <li><span class="k">Часы</span><span class="v">{HOURS}</span></li>
         <li><span class="k">Telegram</span><span class="v"><a href="{TG}" target="_blank" rel="noopener">@Capital_Defence</a></span></li>
-        <li><span class="k">Команда</span><span class="v">3 адвоката, 2 юриста, медиатор</span></li>
       </ul>
       <p class="hero-note">Принимаем в офисе на проспекте Победы. С другими городами работаем удалённо.</p>
     </aside>
@@ -641,6 +643,9 @@ def home():
     <ul class="rows">
 {svc}
     </ul>
+    <div class="actions practice-actions">
+      <a class="btn btn-gold" href="#contact">Записаться на консультацию</a>
+    </div>
   </div>
 </section>
 
