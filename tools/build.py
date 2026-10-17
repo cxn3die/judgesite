@@ -18,6 +18,7 @@ ICON = {
  'phone': '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
  'send': '<svg viewBox="0 0 24 24" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>',
  'radio': '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg>',
+ 'max': '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.3 9 9 0 0 1-3.7-.8L4 21l1.1-4.2A8.2 8.2 0 0 1 4 11.5 8.4 8.4 0 0 1 12.5 3a8.4 8.4 0 0 1 8.5 8.5z"/></svg>',
  'ext': '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>',
 }
 
@@ -104,7 +105,7 @@ def shell(*, root, path, title, description, body, active=None, ld=None, og_type
   </nav>
   <div class="mobile-contacts">
     <a class="btn" href="tel:{PHONE_TEL}">Позвонить {PHONE}</a>
-    <a class="btn btn-ghost" href="{TG}" target="_blank" rel="noopener">Написать в Telegram</a>
+    <a class="btn btn-ghost" href="{TG}" target="_blank" rel="noopener">Написать в Telegram</a>{max_btn()}
   </div>
   <p class="mobile-meta">{ADDR}<br>{HOURS}</p>
 </div>
@@ -172,27 +173,41 @@ def contact_list(items):
     out = ['<ul class="contact-list">']
     for icon, k, v, href, ext in items:
         extra = ' target="_blank" rel="noopener"' if ext else ''
-        cls = ' class="contact-action contact-action-primary"' if icon == 'phone' else (' class="contact-action"' if icon == 'send' else '')
-        label = ('Позвонить в офис' if 'офис' in k.lower() else 'Позвонить лично') if icon == 'phone' else ('Написать в Telegram' if icon == 'send' else k)
+        cls = ' class="contact-action contact-action-primary"' if icon == 'phone' else (' class="contact-action"' if icon in ('send', 'max') else '')
+        if icon == 'phone':
+            label = 'Позвонить в офис' if 'офис' in k.lower() else ('Позвонить на городской' if 'городск' in k.lower() else 'Позвонить лично')
+        else:
+            label = 'Написать в Telegram' if icon == 'send' else ('Написать в Max' if icon == 'max' else k)
         out.append(f'  <li><a{cls} href="{href}"{extra}>{ICON[icon]}<span><span class="k">{label}</span><span class="v">{v}</span></span></a></li>')
     out.append('</ul>')
     return '\n'.join(out)
+
+def max_btn(cls='btn btn-ghost', href=None):
+    """Кнопка «Написать в Max»: выводится, только когда ссылка известна."""
+    href = href if href is not None else MAX
+    return f'\n        <a class="{cls}" href="{href}" target="_blank" rel="noopener">Написать в Max</a>' if href else ''
 
 # ---------------------------------------------------------------------------
 # Люди
 # ---------------------------------------------------------------------------
 PEOPLE = {
  'simkin': dict(name='Ярослав Симкин', role='Адвокат, налоговый консультант, медиатор', img='simkin.jpg', url='/advokaty/simkin.html',
-                short='Экономические дела, банковское и налоговое право, медиация с ФНС.'),
+                short='Экономические споры, банковское и налоговое право, медиация с ФНС. Адвокат с 2019 года.',
+                max=None),
  'chinokalov': dict(name='Максим Чинокалов', role='Адвокат по уголовным делам', img='chinokalov.jpg', url='/advokaty/chinokalov.html',
-                short='15 лет в уголовном процессе, 10 из них — в Следственном комитете. Экономические, должностные и коррупционные дела.'),
- 'truevtsev': dict(name='Михаил Труевцев', role='Адвокат по уголовным, административным и гражданским делам', img=None, initials='МТ', url='/advokaty/truevtsev.html',
-                short='15 лет в Следственном комитете, более 5 лет адвокатской практики.'),
- 'bakoyan': dict(name='Эдгар Бакоян', role='Юрист, налоговый консультант', img=None, initials='ЭБ', url='/yuristy/bakoyan.html',
-                short='НДС, налоговые споры, блокировки счетов по 115-ФЗ.'),
+                short='15 лет в уголовном процессе, 10 из них — в Следственном комитете. Экономические, должностные и коррупционные дела.',
+                max=None),
+ 'truevtsev': dict(name='Михаил Труевцев', full='Михаил Юрьевич Труевцев', role='Адвокат по уголовным, административным и гражданским делам', img='truevtsev.jpg', url='/advokaty/truevtsev.html',
+                short='9 лет в Следственном комитете России, 8 лет адвокатской практики. Сложные уголовные дела.',
+                max=None),
  'shitov': dict(name='Иван Шитов', role='Ведущий юрист', img='shitov.jpg', url='/yuristy/shitov.html',
-                short='Судебная практика, юридический аутсорсинг для бизнеса, 44-ФЗ/РНП, комплаенс.'),
+                short='Судебная практика, юридический аутсорсинг для бизнеса, 44-ФЗ/РНП, комплаенс.',
+                max=None),
 }
+# Ссылки на личные чаты в Max: у Max нет ссылки по номеру телефона, нужна персональная
+# ссылка из приложения (Профиль → QR → «Скопировать ссылку»), вида https://max.ru/u/…
+# Пока ссылки не получены, кнопка «Написать в Max» не выводится.
+MAX = ''  # ссылка на чат агентства в Max
 
 def portrait(root, key, w=600, h=800, lazy=True):
     p = PEOPLE[key]
@@ -234,31 +249,35 @@ ARTICLES = [
       h1='Заменит ли ИИ адвоката?', title='Заменит ли ИИ адвоката? — Максим Чинокалов',
       desc='Чем нейросети реально помогают в юридических вопросах, а где доверие к ним опасно для защиты по уголовному делу. Колонка Максима Чинокалова.',
       cta='Есть похожая ситуация?'),
- dict(slug='bakoyan-bmw-nds-delo', author='bakoyan', type='Разбор практики', topic='Налоги, НДС',
-      h1='Схема с НДС при продаже автомобиля: дело BMW X5', title='Схема с НДС при продаже автомобиля: дело BMW X5 — Эдгар Бакоян',
-      desc='Разбор судебного дела о занижении цены продажи автомобиля, выкупленного из лизинга, для уменьшения НДС. Колонка юриста Эдгара Бакояна.',
+ # Статьи по налогам и 115-ФЗ переданы Ярославу Симкину (src: ключ текста в old_articles.json, old: прежний адрес)
+ dict(slug='simkin-bmw-nds-delo', src='bakoyan-bmw-nds-delo', author='simkin', type='Разбор практики', topic='Налоги, НДС',
+      h1='Схема с НДС при продаже автомобиля: дело BMW X5', title='Схема с НДС при продаже автомобиля: дело BMW X5 — Ярослав Симкин',
+      desc='Разбор судебного дела о занижении цены продажи автомобиля, выкупленного из лизинга, для уменьшения НДС. Колонка адвоката Ярослава Симкина.',
       cta='Похожая ситуация с продажей актива или доначислением НДС?'),
- dict(slug='bakoyan-115-fz-chast-1', author='bakoyan', type='Инструкция', topic='Блокировка счетов, часть 1 из 2',
-      h1='Почему банк блокирует операции и что с этим делать. Часть 1: 115-ФЗ', title='Почему банк блокирует операции. Часть 1: 115-ФЗ — Эдгар Бакоян',
-      desc='Как банк оценивает клиента по 115-ФЗ, почему первый ответ банку решает всё и чем ограничения по 161-ФЗ отличаются от 115-ФЗ. Эдгар Бакоян.',
+ dict(slug='simkin-115-fz-chast-1', src='bakoyan-115-fz-chast-1', author='simkin', type='Инструкция', topic='Блокировка счетов, часть 1 из 2',
+      h1='Почему банк блокирует операции и что с этим делать. Часть 1: 115-ФЗ', title='Почему банк блокирует операции. Часть 1: 115-ФЗ — Ярослав Симкин',
+      desc='Как банк оценивает клиента по 115-ФЗ, почему первый ответ банку решает всё и чем ограничения по 161-ФЗ отличаются от 115-ФЗ. Ярослав Симкин.',
       cta='Банк ограничил операции или запросил документы?'),
- dict(slug='bakoyan-zsk-svetofor-chast-2', author='bakoyan', type='Ликбез', topic='Блокировка счетов, часть 2 из 2',
-      h1='Почему банк блокирует операции. Часть 2: ЗСК («Светофор»)', title='Платформа ЗСК («Светофор»): как банки оценивают риск — Эдгар Бакоян',
-      desc='Как работает платформа ЗСК Центробанка, какие показатели алгоритм считает подозрительными и почему это часто ошибка. Колонка Эдгара Бакояна.',
+ dict(slug='simkin-zsk-svetofor-chast-2', src='bakoyan-zsk-svetofor-chast-2', author='simkin', type='Ликбез', topic='Блокировка счетов, часть 2 из 2',
+      h1='Почему банк блокирует операции. Часть 2: ЗСК («Светофор»)', title='Платформа ЗСК («Светофор»): как банки оценивают риск — Ярослав Симкин',
+      desc='Как работает платформа ЗСК Центробанка, какие показатели алгоритм считает подозрительными и почему это часто ошибка. Колонка Ярослава Симкина.',
       cta='Банк оценил вас как «повышенный риск»?'),
- dict(slug='bakoyan-nds-azy-i-stavki', author='bakoyan', type='Ликбез', topic='НДС, часть 1 из 3',
-      h1='НДС: азы и ставки', title='НДС: азы, вычеты и ставки 2026 года — Эдгар Бакоян',
-      desc='Как устроен НДС: входящий и исходящий налог, вычеты, ставки 0, 10 и 22 % и специальные ставки 5 и 7 % для УСН. Ликбез юриста Эдгара Бакояна.',
+ dict(slug='simkin-nds-azy-i-stavki', src='bakoyan-nds-azy-i-stavki', author='simkin', type='Ликбез', topic='НДС, часть 1 из 3',
+      h1='НДС: азы и ставки', title='НДС: азы, вычеты и ставки 2026 года — Ярослав Симкин',
+      desc='Как устроен НДС: входящий и исходящий налог, вычеты, ставки 0, 10 и 22 % и специальные ставки 5 и 7 % для УСН. Ликбез адвоката Ярослава Симкина.',
       cta='Нужно посчитать, какой режим выгоднее именно вам?'),
- dict(slug='bakoyan-bumazhnyi-nds', author='bakoyan', type='Разбор практики', topic='НДС, часть 2 из 3',
-      h1='Бумажный НДС: экономика жанра', title='Бумажный НДС: экономика жанра — Эдгар Бакоян',
-      desc='Кого на самом деле обкрадывает бумажный НДС, как работает статья 54.1 НК РФ и что изменила уголовная статья 173.3. Разбор Эдгара Бакояна.',
+ dict(slug='simkin-bumazhnyi-nds', src='bakoyan-bumazhnyi-nds', author='simkin', type='Разбор практики', topic='НДС, часть 2 из 3',
+      h1='Бумажный НДС: экономика жанра', title='Бумажный НДС: экономика жанра — Ярослав Симкин',
+      desc='Кого на самом деле обкрадывает бумажный НДС, как работает статья 54.1 НК РФ и что изменила уголовная статья 173.3. Разбор Ярослава Симкина.',
       cta='Получили требование по «разрыву» в цепочке контрагентов?'),
- dict(slug='bakoyan-razryvy-po-nds', author='bakoyan', type='Разбор практики', topic='НДС, часть 3 из 3',
-      h1='Как налоговая находит разрывы по НДС и почему «крайним» может стать честный бизнес', title='Как налоговая находит разрывы по НДС — Эдгар Бакоян',
-      desc='АСК НДС, реестр выгодоприобретателей и балльная система ФНС: как находят разрывы и как не стать «крайним» по чужому разрыву. Эдгар Бакоян.',
+ dict(slug='simkin-razryvy-po-nds', src='bakoyan-razryvy-po-nds', author='simkin', type='Разбор практики', topic='НДС, часть 3 из 3',
+      h1='Как налоговая находит разрывы по НДС и почему «крайним» может стать честный бизнес', title='Как налоговая находит разрывы по НДС — Ярослав Симкин',
+      desc='АСК НДС, реестр выгодоприобретателей и балльная система ФНС: как находят разрывы и как не стать «крайним» по чужому разрыву. Ярослав Симкин.',
       cta='Получили требование как «выгодоприобретатель» по чужому разрыву?'),
 ]
+# Прежние адреса страниц, с которых ставим переадресацию на новые
+REDIRECTS = {'yuristy/bakoyan.html': '/yuristy/'}
+REDIRECTS.update({f'materialy/{a["src"]}.html': f'/materialy/{a["slug"]}.html' for a in ARTICLES if a.get('src')})
 ART = {a['slug']: a for a in ARTICLES}
 for i, a in enumerate(ARTICLES):
     same = [x for x in ARTICLES if x['author'] == a['author']]
@@ -268,9 +287,9 @@ for i, a in enumerate(ARTICLES):
 
 AUTHOR_CTA = {
  'chinokalov': [('tel:' + PHONE_TEL, 'Позвонить в офис', 'btn'), ('https://t.me/Maxim_Chinokalov', 'Написать Максиму Чинокалову', 'btn btn-ghost')],
- 'bakoyan': [('tel:+79024076631', 'Позвонить лично', 'btn'), ('https://t.me/Ed_Law1', 'Написать Эдгару Бакояну', 'btn btn-ghost')],
+ 'simkin': [('tel:+79022097333', 'Позвонить лично', 'btn'), ('https://t.me/true_law333', 'Написать Ярославу Симкину', 'btn btn-ghost')],
 }
-AUTHOR_ROLE = {'chinokalov': 'адвокат по уголовным делам', 'bakoyan': 'юрист, налоговый консультант'}
+AUTHOR_ROLE = {'chinokalov': 'адвокат по уголовным делам', 'simkin': 'адвокат, налоговый консультант, медиатор'}
 
 # ---------------------------------------------------------------------------
 # Статьи: преобразование текста из старой разметки
@@ -403,9 +422,9 @@ def extract_old_article(slug):
 def article_page(a):
     author = PEOPLE[a['author']]
     root = '../'
-    body_html = transform_body(extract_old_article(a['slug']))
-    if a['author'] == 'chinokalov':
-        avatar = f'<img src="{root}assets/img/chinokalov.jpg" alt="" width="44" height="44">'
+    body_html = transform_body(extract_old_article(a.get('src', a['slug'])))
+    if author.get('img'):
+        avatar = f'<img src="{root}assets/img/{author["img"]}" alt="" width="44" height="44">'
     else:
         avatar = f'<span class="avatar" aria-hidden="true">{author["initials"]}</span>'
     cta_links = '\n      '.join(f'<a class="{cls.replace("btn btn-ghost", "btn btn-ghost").replace("btn\"", "btn btn-gold\"") if False else ("btn btn-gold" if cls == "btn" else cls)}" href="{href}"{" target=\"_blank\" rel=\"noopener\"" if href.startswith("http") else ""}>{txt}</a>' for href, txt, cls in AUTHOR_CTA[a['author']])
@@ -609,8 +628,8 @@ def home():
     <h3><a href="uslugi/#{s['id']}"><span class="name">{s['title']}</span><span class="cnt">{services_count(len(s['items']))}</span></a></h3>
     <p>{' '.join(f'<a href="uslugi/#{iid}" data-text="{t}{"," if i < len(s["items"]) - 1 else ""}">{t}{"<span class=\"sep\">,</span>" if i < len(s["items"]) - 1 else ""}</a>' for i, (iid, t, _) in enumerate(s['items']))}</p>
   </li>''' for s in SERVICES)
-    team = '\n'.join(person_card(root, k) for k in ['simkin', 'chinokalov', 'truevtsev', 'bakoyan', 'shitov'])
-    latest = article_rows(root, ['chinokalov-obysk-chto-delat', 'chinokalov-zaderzhanie-chto-delat', 'bakoyan-115-fz-chast-1', 'bakoyan-razryvy-po-nds'])
+    team = '\n'.join(person_card(root, k) for k in ['simkin', 'chinokalov', 'truevtsev', 'shitov'])
+    latest = article_rows(root, ['chinokalov-obysk-chto-delat', 'chinokalov-zaderzhanie-chto-delat', 'simkin-115-fz-chast-1', 'simkin-razryvy-po-nds'])
     body = f'''<section class="hero band-dark">
   <div class="wrap hero-grid">
     <div>
@@ -619,7 +638,7 @@ def home():
       <p class="lead">Уголовные дела, налоги, банкротство, споры с банками, разблокировка счетов, защита бизнеса, семейные споры, представительство в суде. Первый разбор ситуации бесплатный: после него вы понимаете, что делать и с кем.</p>
       <div class="actions">
         <a class="btn btn-gold" href="#contact">Записаться на консультацию</a>
-        <a class="btn btn-ghost" href="{TG}" target="_blank" rel="noopener">Написать в Telegram</a>
+        <a class="btn btn-ghost" href="{TG}" target="_blank" rel="noopener">Написать в Telegram</a>{max_btn()}
       </div>
     </div>
     <aside class="hero-aside">
@@ -776,7 +795,7 @@ def advokaty_index():
     </div>
     <div class="actions">
       <a class="btn btn-gold" href="tel:{PHONE_TEL}">Позвонить {PHONE}</a>
-      <a class="btn btn-ghost" href="{TG}" target="_blank" rel="noopener">Написать в Telegram</a>
+      <a class="btn btn-ghost" href="{TG}" target="_blank" rel="noopener">Написать в Telegram</a>{max_btn()}
     </div>
   </div>
 
@@ -815,10 +834,12 @@ def profile_page(key, *, path, title, description, role_line, intro, sections, c
     reg = f'<p class="profile-registry">{registry}</p>' if registry else ''
     intro_html = f'<p class="lead">{intro}</p>' if intro else ''
     back = ('Ко всем адвокатам', 'advokaty/') if section == 'advokaty' else ('Ко всем юристам', 'yuristy/')
+    if p.get('max'):
+        contacts = list(contacts) + [('max', 'Max', 'личный чат', p['max'], True)]
     body = f'''<section class="page-head band-dark">
   <div class="wrap">
     <p class="kicker">{role_line}</p>
-    <h1>{p['name']}</h1>
+    <h1>{p.get('full', p['name'])}</h1>
     {intro_html}
   </div>
 </section>
@@ -849,19 +870,27 @@ def para(*ps):
 def profiles():
     profile_page('simkin', path='/advokaty/simkin.html', title='Адвокат Ярослав Симкин — Пенза | Capital Defence',
         description='Ярослав Симкин — адвокат по экономическим делам, налоговый консультант и медиатор в Пензе. Образование, опыт, контакты. Capital Defence.',
-        role_line='Адвокат, налоговый консультант, медиатор', intro=None,
+        role_line='Адвокат с 2019 года, налоговый консультант, медиатор', intro=None,
         contacts=[('phone', 'Телефон', '+7 (902) 209‑73‑33', 'tel:+79022097333', False),
                   ('send', 'Telegram', '@true_law333', 'https://t.me/true_law333', True),
                   ('radio', 'Канал агентства', '@Capital_Defence', TG, True)],
-        sections=[('Сфера деятельности', ul(['Адвокат по экономическим делам', 'Специалист по банковскому и налоговому праву',
-                        'Налоговый консультант для бизнеса и физических лиц', 'Медиатор — досудебное урегулирование споров, включая медиацию между бизнесом и ФНС'])),
-                  ('Образование', ul(['ПГУ — юридический факультет, юриспруденция', 'РАНХиГС им. П. А. Столыпина — магистратура и аспирантура, юриспруденция', 'РУАН им. Г. Б. Мирзоева — кафедра адвокатуры'])),
-                  ('Опыт', para('С 2019 года — адвокат Пензенского филиала коллегии адвокатов г. Москвы «Гарант».'))],
-        ld_extra={"alumniOf":["ПГУ","РАНХиГС им. П. А. Столыпина","РУАН им. Г. Б. Мирзоева"],"sameAs":["https://t.me/true_law333"]})
+        registry='Сведения об адвокате внесены в реестр адвокатов Пензенской области, рег. № 58/955. Проверить статус можно на <a href="https://minjust.gov.ru/ru/pages/advokaty-rossijskoj-federacii/" target="_blank" rel="noopener">сайте Минюста России</a>.',
+        sections=[('О себе', para('Я адвокат, налоговый консультант и медиатор. Специализируюсь на экономических спорах, банковском и налоговом праве, помогаю бизнесу и частным клиентам решать сложные юридические вопросы.',
+                        'В своей работе я стремлюсь не просто устранить существующую проблему, но и найти решение, которое позволит избежать лишних рисков в будущем. Особое внимание уделяю анализу документов, оценке правовых последствий и поиску возможностей для досудебного урегулирования споров, в том числе с налоговыми органами.',
+                        'Считаю, что эффективная юридическая помощь — это сочетание глубокого знания закона, практического подхода и понимания интересов доверителя.')),
+                  ('Чем помогаю', ul(['<strong>Экономические споры</strong> — защита интересов бизнеса, правовой анализ ситуации и представительство в суде.',
+                        '<strong>Налоговые вопросы</strong> — консультации для бизнеса и физических лиц, споры с налоговыми органами, оценка налоговых рисков.',
+                        '<strong>Банковское право</strong> — правовая помощь по вопросам банковских обязательств и финансовых споров.',
+                        '<strong>Медиация</strong> — поиск взаимоприемлемых решений и урегулирование конфликтов без длительного судебного разбирательства.',
+                        '<strong>Юридическое сопровождение бизнеса</strong> — анализ договоров, оценка рисков и помощь в решении правовых вопросов.'])),
+                  ('Образование', ul(['Пензенский государственный университет — юридический факультет, юриспруденция', 'РАНХиГС имени П. А. Столыпина — магистратура и аспирантура, юриспруденция', 'РУАН имени Г. Б. Мирзоева — кафедра адвокатуры'])),
+                  ('Опыт', para('С 2019 года — адвокат Пензенского филиала Московской коллегии адвокатов «Гарант».'))],
+        articles=[a['slug'] for a in ARTICLES if a['author'] == 'simkin'],
+        ld_extra={"identifier":"Реестровый № 58/955","alumniOf":["ПГУ","РАНХиГС им. П. А. Столыпина","РУАН им. Г. Б. Мирзоева"],"sameAs":["https://t.me/true_law333"]})
 
     profile_page('chinokalov', path='/advokaty/chinokalov.html', title='Адвокат Максим Чинокалов — уголовные дела, Пенза | Capital Defence',
         description='Максим Чинокалов — адвокат по уголовным делам в Пензе. 15 лет в уголовном процессе, 10 лет в Следственном комитете. Защита на следствии и в суде, УДО, пересмотр приговора.',
-        role_line='Адвокат по уголовным делам',
+        role_line='Адвокат по уголовным делам, более 15 лет в уголовном процессе',
         intro='Защищаю по уголовным делам в Пензе и Пензенской области — от первого объяснения до обжалования приговора. Выезд в другие регионы по согласованию.',
         contacts=[('phone', 'Телефон', '+7 (999) 612‑11‑15', 'tel:+79996121115', False),
                   ('send', 'Telegram', '@Maxim_Chinokalov', 'https://t.me/Maxim_Chinokalov', True),
@@ -876,23 +905,22 @@ def profiles():
         articles=[a['slug'] for a in ARTICLES if a['author'] == 'chinokalov'],
         ld_extra={"identifier":"Реестровый № 58/912","sameAs":["https://t.me/Maxim_Chinokalov","https://t.me/chinokalov_vprave"]})
 
-    profile_page('truevtsev', path='/advokaty/truevtsev.html', title='Адвокат Михаил Труевцев — Пенза | Capital Defence',
-        description='Михаил Труевцев — адвокат по уголовным, административным и гражданским делам в Пензе. 15 лет в Следственном комитете, более 5 лет адвокатской практики.',
-        role_line='Адвокат по уголовным, административным и гражданским делам', intro=None,
-        contacts=[('phone', 'Телефон офиса', PHONE, 'tel:' + PHONE_TEL, False),
+    profile_page('truevtsev', path='/advokaty/truevtsev.html', title='Адвокат Михаил Труевцев — уголовные дела, Пенза | Capital Defence',
+        description='Михаил Юрьевич Труевцев — адвокат по уголовным, административным и гражданским делам в Пензе. 9 лет в Следственном комитете России, 8 лет адвокатской практики.',
+        role_line='Адвокат, 17 лет профессионального опыта', intro=None,
+        contacts=[('phone', 'Телефон', '+7 (902) 207‑74‑16', 'tel:+79022077416', False),
+                  ('phone', 'Городской', '+7 (8412) 77‑74‑16', 'tel:+78412777416', False),
                   ('send', 'Telegram агентства', '@Capital_Defence', TG, True)],
-        sections=[('Опыт', ul(['15 лет работы в Следственном комитете', 'Более 5 лет адвокатской практики', '30 судебных дел']))])
-
-    profile_page('bakoyan', section='yuristy', path='/yuristy/bakoyan.html', title='Юрист Эдгар Бакоян — налоговый консультант, Пенза | Capital Defence',
-        description='Эдгар Варданович Бакоян — юрист, налоговый консультант Capital Defence. НДС, 115-ФЗ, налоговые споры. Контакты и статьи.',
-        role_line='Юрист, налоговый консультант', intro=None,
-        contacts=[('phone', 'Телефон', '+7 (902) 407‑66‑31', 'tel:+79024076631', False),
-                  ('send', 'Telegram', '@Ed_Law1', 'https://t.me/Ed_Law1', True),
-                  ('radio', 'Канал агентства', '@Capital_Defence', TG, True)],
-        sections=[('Сфера деятельности', ul(['Налоговые споры и налоговое консультирование бизнеса', 'НДС: ставки, вычеты, «бумажный» НДС, разрывы в цепочке контрагентов',
-                        'Сопровождение при блокировке счетов (115-ФЗ, 161-ФЗ), взаимодействие с банковским комплаенсом', 'Анализ судебной практики по налоговым делам']))],
-        articles=[a['slug'] for a in ARTICLES if a['author'] == 'bakoyan'],
-        ld_extra={"sameAs":["https://t.me/Ed_Law1"]})
+        registry='Сведения об адвокате внесены в реестр адвокатов Пензенской области, рег. № 58/857. Проверить статус можно на <a href="https://minjust.gov.ru/ru/pages/advokaty-rossijskoj-federacii/" target="_blank" rel="noopener">сайте Минюста России</a>.',
+        sections=[('О себе', para('9 лет я проработал в Следственном комитете России, ещё 8 лет занимаюсь адвокатской практикой. Опыт работы внутри следственной системы помогает мне понимать логику расследования, оценивать доказательства и видеть слабые места позиции обвинения.',
+                        'Я специализируюсь на сложных юридических делах, в которых особенно важны стратегия, внимание к деталям и последовательная защита интересов доверителя. В каждом деле я стремлюсь найти эффективное правовое решение и объективно оцениваю перспективы и риски.')),
+                  ('Чем помогаю', ul(['<strong>Уголовные дела</strong> — защита на стадии расследования и в суде, анализ доказательств, обжалование процессуальных решений.',
+                        '<strong>Задержание и меры пресечения</strong> — оперативная защита прав и интересов доверителя.',
+                        '<strong>Административные и гражданские споры</strong> — правовой анализ, подготовка документов и представительство в суде.',
+                        '<strong>Юридическое сопровождение</strong> — от первичной консультации и разработки правовой позиции до завершения дела.'])),
+                  ('Образование', para('Пензенский государственный педагогический университет имени В. Г. Белинского.')),
+                  ('Опыт работы', para('9 лет в Следственном комитете России, 8 лет адвокатской практики.'))],
+        ld_extra={"identifier":"Реестровый № 58/857","alumniOf":["ПГПУ им. В. Г. Белинского"]})
 
     profile_page('shitov', section='yuristy', path='/yuristy/shitov.html', title='Юрист Иван Шитов — судебная практика и аутсорсинг, Пенза | Capital Defence',
         description='Иван Шитов — ведущий юрист Capital Defence. Судебная практика, юридический аутсорсинг для бизнеса, 44-ФЗ/РНП, комплаенс 152-ФЗ.',
@@ -918,7 +946,7 @@ def profiles():
 # ---------------------------------------------------------------------------
 def yuristy_index():
     root = '../'
-    cards = '\n'.join(person_card(root, k, desc=True, more=True) for k in ['bakoyan', 'shitov'])
+    cards = '\n'.join(person_card(root, k, desc=True, more=True) for k in ['shitov'])
     body = f'''<section class="page-head band-dark">
   <div class="wrap">
     <h1>Договорная работа, бизнес и представительство без статуса адвоката</h1>
@@ -942,7 +970,7 @@ def yuristy_index():
   </div>
 </div></section>'''
     write('yuristy/index.html', shell(root=root, path='/yuristy/', title='Юристы в Пензе — договоры, налоги и сопровождение бизнеса | Capital Defence',
-        description='Юристы агентства Capital Defence в Пензе: Эдгар Бакоян и Иван Шитов. Договорная работа, налоговые споры, 115-ФЗ, сопровождение сделок и бизнеса.',
+        description='Юрист агентства Capital Defence в Пензе Иван Шитов: договорная работа, судебная практика, сопровождение сделок и бизнеса, 44-ФЗ и комплаенс.',
         body=body, active='yuristy', crumbs=[('Главная', '/'), ('Юристы', '/yuristy/')]))
 
 # ---------------------------------------------------------------------------
@@ -951,7 +979,7 @@ def yuristy_index():
 def materialy_index():
     root = '../'
     ch = [a['slug'] for a in ARTICLES if a['author'] == 'chinokalov']
-    bk = [a['slug'] for a in ARTICLES if a['author'] == 'bakoyan']
+    bk = [a['slug'] for a in ARTICLES if a['author'] == 'simkin']
     body = f'''<section class="page-head band-dark">
   <div class="wrap">
     <h1>Практические материалы от команды Capital Defence</h1>
@@ -969,10 +997,10 @@ def materialy_index():
 {article_rows(root, ch, show_author=False)}
 
   <div class="author-block">
-    <span class="avatar" aria-hidden="true">ЭБ</span>
+    <img src="{root}assets/img/simkin.jpg" alt="" width="56" height="56">
     <div>
-      <h2><a href="{root}yuristy/bakoyan.html">Эдгар Бакоян</a></h2>
-      <p class="meta">Юрист, налоговый консультант, {len(bk)} материалов</p>
+      <h2><a href="{root}advokaty/simkin.html">Ярослав Симкин</a></h2>
+      <p class="meta">Адвокат, налоговый консультант, медиатор, {len(bk)} материалов</p>
     </div>
   </div>
 {article_rows(root, bk, show_author=False)}
@@ -1128,10 +1156,21 @@ def documents():
   <p style="margin-top:30px;">Подтверждая согласие, я ознакомлен(-а) с <a href="politika-obrabotki-pd.html">Политикой в отношении обработки персональных данных</a> Оператора.</p>''')
 
 # ---------------------------------------------------------------------------
+def redirect_page(old_rel, new_path):
+    """Страница-переадресация со старого адреса на новый (поисковикам: noindex)."""
+    depth = old_rel.count('/')
+    rel_new = '../' * depth + new_path.lstrip('/')
+    write(old_rel, f'''<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><title>Страница переехала</title>
+<meta name="robots" content="noindex"><link rel="canonical" href="{SITE}{new_path}">
+<meta http-equiv="refresh" content="0; url={rel_new}"></head>
+<body><p>Страница переехала: <a href="{rel_new}">{SITE}{new_path}</a></p></body></html>
+''')
+
 def sitemap():
     today = '2026-10-13'
     urls = ['/', '/uslugi/', '/advokaty/', '/advokaty/simkin.html', '/advokaty/chinokalov.html', '/advokaty/truevtsev.html',
-            '/yuristy/', '/yuristy/bakoyan.html', '/yuristy/shitov.html', '/materialy/'] + \
+            '/yuristy/', '/yuristy/shitov.html', '/materialy/'] + \
            [f'/materialy/{a["slug"]}.html' for a in ARTICLES] + \
            ['/dokumenty/politika-obrabotki-pd.html', '/dokumenty/polozhenie-o-pd.html', '/dokumenty/soglasie-na-obrabotku-pd.html']
     body = '\n'.join(f'  <url><loc>{SITE}{u}</loc><lastmod>{today}</lastmod></url>' for u in urls)
@@ -1149,3 +1188,5 @@ if __name__ == '__main__':
     home(); uslugi_index(); advokaty_index(); yuristy_index(); profiles(); materialy_index(); documents(); sitemap()
     for a in ARTICLES:
         article_page(a)
+    for old, new in REDIRECTS.items():
+        redirect_page(old, new)
