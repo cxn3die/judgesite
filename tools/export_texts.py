@@ -172,7 +172,8 @@ def section(title, rel, src, kind=''):
 
 def listing(folder):
     files = sorted(f for f in os.listdir(os.path.join(ROOT, folder)) if f.endswith('.html') and f != 'index.html')
-    return [folder + '/' + f for f in files]
+    # страницы-переадресации со старых адресов текста не содержат
+    return [folder + '/' + f for f in files if 'http-equiv="refresh"' not in read(folder + '/' + f)]
 
 
 parts = []
@@ -193,12 +194,9 @@ hdr = extract(home, 'header', 'site-header'); ftr = extract(home, 'footer', 'foo
 parts.append('# Шапка и подвал (одинаковые на всех страницах)\n\n### Шапка\n\n' + hdr + '\n### Подвал\n\n' + ftr)
 parts.append(section('Страница: Главная', 'index.html', home))
 parts.append(section('Страница: Услуги', 'uslugi/', read('uslugi/index.html')))
-parts.append(section('Страница: Адвокаты', 'advokaty/', read('advokaty/index.html')))
-for rel in listing('advokaty'):
-    s = read(rel); parts.append(section(f'Страница: Адвокат {h1_of(s)}', rel, s))
-parts.append(section('Страница: Юристы', 'yuristy/', read('yuristy/index.html')))
-for rel in listing('yuristy'):
-    s = read(rel); parts.append(section(f'Страница: Юрист {h1_of(s)}', rel, s))
+parts.append(section('Страница: Команда', 'komanda/', read('komanda/index.html')))
+for rel in listing('komanda'):
+    s = read(rel); parts.append(section(f'Страница: {h1_of(s)}', rel, s))
 parts.append(section('Страница: Материалы', 'materialy/', read('materialy/index.html'),
                      'Список статей на этой странице собирается из самих статей: названия правьте в разделе каждой статьи ниже.'))
 for rel in listing('materialy'):

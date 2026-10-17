@@ -40,9 +40,8 @@ def shell(*, root, path, title, description, body, active=None, ld=None, og_type
     ld_html = '\n'.join(jsonld(x) for x in ld)
     def cur(key):
         return ' aria-current="page"' if key == active else ''
-    nav_items = [('uslugi', root + 'uslugi/', 'Услуги'), ('advokaty', root + 'advokaty/', 'Адвокаты'),
-                 ('yuristy', root + 'yuristy/', 'Юристы'), ('materialy', root + 'materialy/', 'Материалы'),
-                 ('contact', root + '#contact', 'Контакты')]
+    nav_items = [('uslugi', root + 'uslugi/', 'Услуги'), ('komanda', root + 'komanda/', 'Команда'),
+                 ('materialy', root + 'materialy/', 'Материалы'), ('contact', root + '#contact', 'Контакты')]
     nav = '\n      '.join(f'<a href="{h}"{cur(k)}>{t}</a>' for k, h, t in nav_items)
     mnav = '\n      '.join(f'<a href="{h}"{cur(k)}>{t}</a>' for k, h, t in [('home', root or './', 'Главная')] + nav_items)
     crumb_html = ''
@@ -128,8 +127,7 @@ def shell(*, root, path, title, description, body, active=None, ld=None, og_type
         <h4>Разделы</h4>
         <ul>
           <li><a href="{root}uslugi/">Услуги</a></li>
-          <li><a href="{root}advokaty/">Адвокаты</a></li>
-          <li><a href="{root}yuristy/">Юристы</a></li>
+          <li><a href="{root}komanda/">Команда</a></li>
           <li><a href="{root}materialy/">Материалы</a></li>
         </ul>
       </div>
@@ -190,17 +188,18 @@ def max_btn(cls='btn btn-ghost', href=None):
 # ---------------------------------------------------------------------------
 # Люди
 # ---------------------------------------------------------------------------
+# name: имя и фамилия для списков и подписей; full: с отчеством, только в заголовке профиля
 PEOPLE = {
- 'simkin': dict(name='Ярослав Симкин', role='Адвокат, налоговый консультант, медиатор', img='simkin.jpg', url='/advokaty/simkin.html',
-                short='Экономические споры, банковское и налоговое право, медиация с ФНС. Адвокат с 2019 года.',
+ 'simkin': dict(name='Ярослав Симкин', full='Ярослав Евгеньевич Симкин', role='Адвокат, налоговый консультант, медиатор', img='simkin.jpg', url='/komanda/simkin.html',
+                short='Экономические споры, банковское и налоговое право, медиация с ФНС. Более 10 лет в уголовном процессе, адвокат с 2019 года.',
                 max=None),
- 'chinokalov': dict(name='Максим Чинокалов', role='Адвокат по уголовным делам', img='chinokalov.jpg', url='/advokaty/chinokalov.html',
+ 'chinokalov': dict(name='Максим Чинокалов', full='Максим Викторович Чинокалов', role='Адвокат по уголовным делам', img='chinokalov.jpg', url='/komanda/chinokalov.html',
                 short='15 лет в уголовном процессе, 10 из них — в Следственном комитете. Экономические, должностные и коррупционные дела.',
                 max=None),
- 'truevtsev': dict(name='Михаил Труевцев', full='Михаил Юрьевич Труевцев', role='Адвокат по уголовным, административным и гражданским делам', img='truevtsev.jpg', url='/advokaty/truevtsev.html',
+ 'truevtsev': dict(name='Михаил Труевцев', full='Михаил Юрьевич Труевцев', role='Адвокат по уголовным, административным и гражданским делам', img='truevtsev.jpg', url='/komanda/truevtsev.html',
                 short='9 лет в Следственном комитете России, 8 лет адвокатской практики. Сложные уголовные дела.',
                 max=None),
- 'shitov': dict(name='Иван Шитов', role='Ведущий юрист', img='shitov.jpg', url='/yuristy/shitov.html',
+ 'shitov': dict(name='Иван Шитов', full='Иван Дмитриевич Шитов', role='Ведущий юрист', img='shitov.jpg', url='/komanda/shitov.html',
                 short='Судебная практика, юридический аутсорсинг для бизнеса, 44-ФЗ/РНП, комплаенс.',
                 max=None),
 }
@@ -276,7 +275,11 @@ ARTICLES = [
       cta='Получили требование как «выгодоприобретатель» по чужому разрыву?'),
 ]
 # Прежние адреса страниц, с которых ставим переадресацию на новые
-REDIRECTS = {'yuristy/bakoyan.html': '/yuristy/'}
+REDIRECTS = {'yuristy/bakoyan.html': '/komanda/',
+             # разделы «Адвокаты» и «Юристы» объединены в «Команду»
+             'advokaty/index.html': '/komanda/', 'yuristy/index.html': '/komanda/',
+             'advokaty/simkin.html': '/komanda/simkin.html', 'advokaty/chinokalov.html': '/komanda/chinokalov.html',
+             'advokaty/truevtsev.html': '/komanda/truevtsev.html', 'yuristy/shitov.html': '/komanda/shitov.html'}
 REDIRECTS.update({f'materialy/{a["src"]}.html': f'/materialy/{a["slug"]}.html' for a in ARTICLES if a.get('src')})
 ART = {a['slug']: a for a in ARTICLES}
 for i, a in enumerate(ARTICLES):
@@ -678,8 +681,7 @@ def home():
 {team}
     </div>
     <div class="team-links">
-      <a class="text-link" href="advokaty/">Все адвокаты</a>
-      <a class="text-link" href="yuristy/">Все юристы</a>
+      <a class="text-link" href="komanda/">Вся команда</a>
     </div>
   </div>
 </section>
@@ -754,9 +756,9 @@ def home():
 # ---------------------------------------------------------------------------
 # Адвокаты
 # ---------------------------------------------------------------------------
-def advokaty_index():
+def komanda_index():
     root = '../'
-    cards = '\n'.join(person_card(root, k, desc=True, more=True) for k in ['simkin', 'chinokalov', 'truevtsev'])
+    cards = '\n'.join(person_card(root, k, desc=True, more=True) for k in ['simkin', 'chinokalov', 'truevtsev', 'shitov'])
     situations = [
         ('Задержание и доставление', 'Установление места и статуса, фиксация времени, право на защитника с первой минуты.'),
         ('Обыск, осмотр, выемка', 'Контроль постановления и протокола — что и как изымается, замечания по ходу действия.'),
@@ -782,8 +784,8 @@ def advokaty_index():
     fq = '\n'.join(f'  <details><summary>{q}</summary><p>{a}</p></details>' for q, a in faq)
     body = f'''<section class="page-head band-dark">
   <div class="wrap">
-    <h1>Защита на следствии, в суде и при силовых мероприятиях</h1>
-    <p class="lead">Каждый адвокат ведёт дело лично, от первого звонка до итогового решения. У каждого своя страница с полным профилем и контактами.</p>
+    <h1>Адвокаты и юристы Capital Defence</h1>
+    <p class="lead">Каждый ведёт дело лично, от первого звонка до итогового решения. Адвокаты работают на следствии и в суде, юрист сопровождает договоры и бизнес. У каждого своя страница с профилем и контактами.</p>
   </div>
 </section>
 <section class="band band-light"><div class="wrap">
@@ -803,6 +805,18 @@ def advokaty_index():
 {cards}
   </div>
 
+  <div class="panel-dark" style="margin:clamp(48px,6vw,80px) 0 0;">
+    <div>
+      <p class="kicker">Для бизнеса</p>
+      <h2>Юридическое сопровождение на аутсорсинге</h2>
+      <p>Договоры, претензии, проверка контрагентов, споры в арбитраже и работа с налоговой без штатного юриста.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-gold" href="{root}#contact">Обсудить задачу</a>
+      <a class="btn btn-ghost" href="{TG}" target="_blank" rel="noopener">Написать в Telegram</a>{max_btn()}
+    </div>
+  </div>
+
   <div class="sub-head"><h2>С какими ситуациями обращаются чаще всего</h2></div>
   <div class="situations">
 {sit}
@@ -818,9 +832,9 @@ def advokaty_index():
 {fq}
   </div>
 </div></section>'''
-    write('advokaty/index.html', shell(root=root, path='/advokaty/', title='Адвокаты в Пензе — уголовные, экономические и административные дела | Capital Defence',
-        description='Адвокаты юридического агентства Capital Defence в Пензе: Ярослав Симкин, Максим Чинокалов, Михаил Труевцев. Защита на следствии и в суде, срочный выезд.',
-        body=body, active='advokaty', crumbs=[('Главная', '/'), ('Адвокаты', '/advokaty/')]))
+    write('komanda/index.html', shell(root=root, path='/komanda/', title='Команда Capital Defence — адвокаты и юрист в Пензе',
+        description='Команда юридического агентства Capital Defence в Пензе: адвокаты Ярослав Симкин, Максим Чинокалов, Михаил Труевцев и юрист Иван Шитов. Защита на следствии и в суде, сопровождение бизнеса.',
+        body=body, active='komanda', crumbs=[('Главная', '/'), ('Команда', '/komanda/')]))
 
 def profile_page(key, *, path, title, description, role_line, intro, sections, contacts, registry=None, articles=None, ld_extra=None, section='advokaty'):
     root = '../'
@@ -833,7 +847,7 @@ def profile_page(key, *, path, title, description, role_line, intro, sections, c
         arts = f'\n    <div class="profile-section">\n      <h2>Статьи</h2>\n{article_rows(root, articles, show_author=False)}\n    </div>'
     reg = f'<p class="profile-registry">{registry}</p>' if registry else ''
     intro_html = f'<p class="lead">{intro}</p>' if intro else ''
-    back = ('Ко всем адвокатам', 'advokaty/') if section == 'advokaty' else ('Ко всем юристам', 'yuristy/')
+    back = ('Ко всей команде', 'komanda/')
     if p.get('max'):
         contacts = list(contacts) + [('max', 'Max', 'личный чат', p['max'], True)]
     body = f'''<section class="page-head band-dark">
@@ -858,9 +872,8 @@ def profile_page(key, *, path, title, description, role_line, intro, sections, c
                 "url":SITE+p['url'],"worksFor":ORG}, **(ld_extra or {}))]
     if p['img']:
         ld[0]['image'] = SITE + '/assets/img/' + p['img']
-    sect_name = 'Адвокаты' if section == 'advokaty' else 'Юристы'
-    write(path.lstrip('/'), shell(root=root, path=path, title=title, description=description, body=body, active=section, ld=ld,
-          crumbs=[('Главная', '/'), (sect_name, f'/{section}/'), (p['name'], path)]))
+    write(path.lstrip('/'), shell(root=root, path=path, title=title, description=description, body=body, active='komanda', ld=ld,
+          crumbs=[('Главная', '/'), ('Команда', '/komanda/'), (p['name'], path)]))
 
 def ul(items):
     return '      <ul>' + ''.join(f'<li>{x}</li>' for x in items) + '</ul>'
@@ -868,9 +881,9 @@ def para(*ps):
     return '\n'.join(f'      <p>{x}</p>' for x in ps)
 
 def profiles():
-    profile_page('simkin', path='/advokaty/simkin.html', title='Адвокат Ярослав Симкин — Пенза | Capital Defence',
-        description='Ярослав Симкин — адвокат по экономическим делам, налоговый консультант и медиатор в Пензе. Образование, опыт, контакты. Capital Defence.',
-        role_line='Адвокат с 2019 года, налоговый консультант, медиатор', intro=None,
+    profile_page('simkin', path='/komanda/simkin.html', title='Адвокат Ярослав Симкин — Пенза | Capital Defence',
+        description='Ярослав Евгеньевич Симкин — адвокат по экономическим делам, налоговый консультант и медиатор в Пензе. Более 10 лет в уголовном процессе, адвокат с 2019 года.',
+        role_line='Более 10 лет в уголовном процессе, адвокат с 2019 года', intro=None,
         contacts=[('phone', 'Телефон', '+7 (902) 209‑73‑33', 'tel:+79022097333', False),
                   ('send', 'Telegram', '@true_law333', 'https://t.me/true_law333', True),
                   ('radio', 'Канал агентства', '@Capital_Defence', TG, True)],
@@ -888,8 +901,8 @@ def profiles():
         articles=[a['slug'] for a in ARTICLES if a['author'] == 'simkin'],
         ld_extra={"identifier":"Реестровый № 58/955","alumniOf":["ПГУ","РАНХиГС им. П. А. Столыпина","РУАН им. Г. Б. Мирзоева"],"sameAs":["https://t.me/true_law333"]})
 
-    profile_page('chinokalov', path='/advokaty/chinokalov.html', title='Адвокат Максим Чинокалов — уголовные дела, Пенза | Capital Defence',
-        description='Максим Чинокалов — адвокат по уголовным делам в Пензе. 15 лет в уголовном процессе, 10 лет в Следственном комитете. Защита на следствии и в суде, УДО, пересмотр приговора.',
+    profile_page('chinokalov', path='/komanda/chinokalov.html', title='Адвокат Максим Чинокалов — уголовные дела, Пенза | Capital Defence',
+        description='Максим Викторович Чинокалов — адвокат по уголовным делам в Пензе. 15 лет в уголовном процессе, 10 лет в Следственном комитете. Защита на следствии и в суде, УДО, пересмотр приговора.',
         role_line='Адвокат по уголовным делам, более 15 лет в уголовном процессе',
         intro='Защищаю по уголовным делам в Пензе и Пензенской области — от первого объяснения до обжалования приговора. Выезд в другие регионы по согласованию.',
         contacts=[('phone', 'Телефон', '+7 (999) 612‑11‑15', 'tel:+79996121115', False),
@@ -905,12 +918,13 @@ def profiles():
         articles=[a['slug'] for a in ARTICLES if a['author'] == 'chinokalov'],
         ld_extra={"identifier":"Реестровый № 58/912","sameAs":["https://t.me/Maxim_Chinokalov","https://t.me/chinokalov_vprave"]})
 
-    profile_page('truevtsev', path='/advokaty/truevtsev.html', title='Адвокат Михаил Труевцев — уголовные дела, Пенза | Capital Defence',
+    profile_page('truevtsev', path='/komanda/truevtsev.html', title='Адвокат Михаил Труевцев — уголовные дела, Пенза | Capital Defence',
         description='Михаил Юрьевич Труевцев — адвокат по уголовным, административным и гражданским делам в Пензе. 9 лет в Следственном комитете России, 8 лет адвокатской практики.',
-        role_line='Адвокат, 17 лет профессионального опыта', intro=None,
+        role_line='Адвокат, 17 лет профессионального опыта',
+        intro='Защита по сложным уголовным делам. Опыт работы в Следственном комитете России — понимание следствия изнутри.',
         contacts=[('phone', 'Телефон', '+7 (902) 207‑74‑16', 'tel:+79022077416', False),
-                  ('phone', 'Городской', '+7 (8412) 77‑74‑16', 'tel:+78412777416', False),
-                  ('send', 'Telegram агентства', '@Capital_Defence', TG, True)],
+                  ('send', 'Telegram', '+7 (902) 207‑74‑16', 'https://t.me/+79022077416', True),
+                  ('radio', 'Канал агентства', '@Capital_Defence', TG, True)],
         registry='Сведения об адвокате внесены в реестр адвокатов Пензенской области, рег. № 58/857. Проверить статус можно на <a href="https://minjust.gov.ru/ru/pages/advokaty-rossijskoj-federacii/" target="_blank" rel="noopener">сайте Минюста России</a>.',
         sections=[('О себе', para('9 лет я проработал в Следственном комитете России, ещё 8 лет занимаюсь адвокатской практикой. Опыт работы внутри следственной системы помогает мне понимать логику расследования, оценивать доказательства и видеть слабые места позиции обвинения.',
                         'Я специализируюсь на сложных юридических делах, в которых особенно важны стратегия, внимание к деталям и последовательная защита интересов доверителя. В каждом деле я стремлюсь найти эффективное правовое решение и объективно оцениваю перспективы и риски.')),
@@ -922,12 +936,13 @@ def profiles():
                   ('Опыт работы', para('9 лет в Следственном комитете России, 8 лет адвокатской практики.'))],
         ld_extra={"identifier":"Реестровый № 58/857","alumniOf":["ПГПУ им. В. Г. Белинского"]})
 
-    profile_page('shitov', section='yuristy', path='/yuristy/shitov.html', title='Юрист Иван Шитов — судебная практика и аутсорсинг, Пенза | Capital Defence',
-        description='Иван Шитов — ведущий юрист Capital Defence. Судебная практика, юридический аутсорсинг для бизнеса, 44-ФЗ/РНП, комплаенс 152-ФЗ.',
+    profile_page('shitov', path='/komanda/shitov.html', title='Юрист Иван Шитов — судебная практика и аутсорсинг, Пенза | Capital Defence',
+        description='Иван Дмитриевич Шитов — ведущий юрист Capital Defence. Судебная практика, юридический аутсорсинг для бизнеса, 44-ФЗ/РНП, комплаенс 152-ФЗ.',
         role_line='Ведущий юрист',
         intro='Полный цикл судебной работы и комплексное юридическое сопровождение бизнеса — от проверки поставщика и согласования контракта до победы в суде и сопровождения банкротства.',
         contacts=[('phone', 'Телефон офиса', PHONE, 'tel:' + PHONE_TEL, False),
-                  ('send', 'Telegram агентства', '@Capital_Defence', TG, True)],
+                  ('send', 'Telegram', '@am_yuc_nb', 'https://t.me/am_yuc_nb', True),
+                  ('radio', 'Канал агентства', '@Capital_Defence', TG, True)],
         sections=[('Судебная практика и защита интересов', ul(['Полное ведение дел в арбитражных судах и судах общей юрисдикции — от расчёта госпошлины и подготовки иска до получения решения и сопровождения исполнительного производства в ФССП',
                         'Разработка судебной стратегии: поиск и анализ практики, допрос экспертов, подготовка и опрос свидетелей, формирование устной позиции для заседаний',
                         'Банкротство физических лиц: сбор документов, подготовка и подача заявления, полное сопровождение процедуры',
@@ -940,38 +955,6 @@ def profiles():
                   ('Образование', ul(['СГЮА — институт юстиции, юриспруденция', 'ПГУ — магистратура, кафедра частного и публичного права'])),
                   ('Опыт', para('Сопровождение производственных, строительных и торговых компаний. Знает отраслевую специфику и закрывает весь спектр правовых задач — от договора до победы в суде. Опыт работы с производственными, торговыми и проектными компаниями позволяет говорить с бизнесом на одном языке.'))],
         ld_extra={"alumniOf":["СГЮА — институт юстиции","ПГУ — магистратура, кафедра частного и публичного права"]})
-
-# ---------------------------------------------------------------------------
-# Юристы
-# ---------------------------------------------------------------------------
-def yuristy_index():
-    root = '../'
-    cards = '\n'.join(person_card(root, k, desc=True, more=True) for k in ['shitov'])
-    body = f'''<section class="page-head band-dark">
-  <div class="wrap">
-    <h1>Договорная работа, бизнес и представительство без статуса адвоката</h1>
-    <p class="lead">Юристы ведут договоры, сопровождение сделок и споров там, где не требуется адвокатский статус, и подключают адвоката, когда дело доходит до следствия или суда.</p>
-  </div>
-</section>
-<section class="band band-light"><div class="wrap">
-  <div class="directory">
-{cards}
-  </div>
-  <div class="panel-dark" style="margin:clamp(48px,6vw,80px) 0 0;">
-    <div>
-      <p class="kicker">Для бизнеса</p>
-      <h2>Юридическое сопровождение на аутсорсинге</h2>
-      <p>Договоры, претензии, проверка контрагентов, споры в арбитраже и работа с налоговой без штатного юриста.</p>
-    </div>
-    <div class="actions">
-      <a class="btn btn-gold" href="{root}#contact">Обсудить задачу</a>
-      <a class="btn btn-ghost" href="{TG}" target="_blank" rel="noopener">Написать в Telegram</a>
-    </div>
-  </div>
-</div></section>'''
-    write('yuristy/index.html', shell(root=root, path='/yuristy/', title='Юристы в Пензе — договоры, налоги и сопровождение бизнеса | Capital Defence',
-        description='Юрист агентства Capital Defence в Пензе Иван Шитов: договорная работа, судебная практика, сопровождение сделок и бизнеса, 44-ФЗ и комплаенс.',
-        body=body, active='yuristy', crumbs=[('Главная', '/'), ('Юристы', '/yuristy/')]))
 
 # ---------------------------------------------------------------------------
 # Материалы
@@ -990,7 +973,7 @@ def materialy_index():
   <div class="author-block">
     <img src="{root}assets/img/chinokalov.jpg" alt="" width="56" height="56">
     <div>
-      <h2><a href="{root}advokaty/chinokalov.html">Максим Чинокалов</a></h2>
+      <h2><a href="{root}komanda/chinokalov.html">Максим Чинокалов</a></h2>
       <p class="meta">Адвокат по уголовным делам, {len(ch)} материалов</p>
     </div>
   </div>
@@ -999,7 +982,7 @@ def materialy_index():
   <div class="author-block">
     <img src="{root}assets/img/simkin.jpg" alt="" width="56" height="56">
     <div>
-      <h2><a href="{root}advokaty/simkin.html">Ярослав Симкин</a></h2>
+      <h2><a href="{root}komanda/simkin.html">Ярослав Симкин</a></h2>
       <p class="meta">Адвокат, налоговый консультант, медиатор, {len(bk)} материалов</p>
     </div>
   </div>
@@ -1169,8 +1152,8 @@ def redirect_page(old_rel, new_path):
 
 def sitemap():
     today = '2026-10-13'
-    urls = ['/', '/uslugi/', '/advokaty/', '/advokaty/simkin.html', '/advokaty/chinokalov.html', '/advokaty/truevtsev.html',
-            '/yuristy/', '/yuristy/shitov.html', '/materialy/'] + \
+    urls = ['/', '/uslugi/', '/komanda/', '/komanda/simkin.html', '/komanda/chinokalov.html', '/komanda/truevtsev.html',
+            '/komanda/shitov.html', '/materialy/'] + \
            [f'/materialy/{a["slug"]}.html' for a in ARTICLES] + \
            ['/dokumenty/politika-obrabotki-pd.html', '/dokumenty/polozhenie-o-pd.html', '/dokumenty/soglasie-na-obrabotku-pd.html']
     body = '\n'.join(f'  <url><loc>{SITE}{u}</loc><lastmod>{today}</lastmod></url>' for u in urls)
@@ -1185,7 +1168,7 @@ if __name__ == '__main__':
         bodies = {a['slug']: extract_old_article(a['slug']) for a in ARTICLES}
         json.dump(bodies, open(cache, 'w', encoding='utf-8'), ensure_ascii=False)
     extract_old_article = lambda slug: bodies[slug]  # noqa
-    home(); uslugi_index(); advokaty_index(); yuristy_index(); profiles(); materialy_index(); documents(); sitemap()
+    home(); uslugi_index(); komanda_index(); profiles(); materialy_index(); documents(); sitemap()
     for a in ARTICLES:
         article_page(a)
     for old, new in REDIRECTS.items():

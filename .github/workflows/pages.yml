@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - claude/compassionate-darwin-fdjjqd
   workflow_dispatch:
 
 permissions:
