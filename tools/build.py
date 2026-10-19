@@ -39,6 +39,12 @@ ICON = {
  'ext': '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>',
 }
 
+def asset_ver(rel):
+    """Версия файла по его содержимому: после любой правки стилей или скрипта
+    браузеры сразу берут новый файл, а не старый из кэша."""
+    import hashlib
+    return hashlib.md5(open(os.path.join(ROOT, rel), 'rb').read()).hexdigest()[:8]
+
 def jsonld(obj):
     return '<script type="application/ld+json">\n' + json.dumps(obj, ensure_ascii=False, indent=1) + '\n</script>'
 
@@ -96,8 +102,8 @@ def shell(*, root, path, title, description, body, active=None, ld=None, og_type
 <link rel="icon" href="{root}favicon.ico" sizes="32x32">
 <link rel="icon" href="{root}assets/img/favicon-32.png" type="image/png">
 <link rel="apple-touch-icon" href="{root}assets/img/apple-touch-icon.png">
-<link rel="stylesheet" href="{root}assets/style.css?v=20261014-cta">
-<script src="{root}assets/site.js" defer></script>
+<link rel="stylesheet" href="{root}assets/style.css?v={asset_ver('assets/style.css')}">
+<script src="{root}assets/site.js?v={asset_ver('assets/site.js')}" defer></script>
 {ld_html}
 </head>
 <body>
