@@ -456,6 +456,7 @@ body.menu-open .mobile-menu{display:block;}
 .footer .brand{align-items:flex-start;}
 .footer .brand img{width:36px;height:36px;}
 .footer-addr{margin-top:16px;line-height:1.6;color:var(--ink-2);max-width:30ch;}
+.footer-legal{margin-top:14px;font-size:0.8125rem;line-height:1.55;color:var(--muted);max-width:36ch;}
 .footer h4{font-size:var(--t-sm);font-weight:600;color:var(--ink);margin-bottom:12px;}
 .footer ul{list-style:none;display:grid;gap:8px;}
 .footer li a:hover{color:var(--gold-700);}
