@@ -354,6 +354,25 @@ def build_list(cls, items):
     c = {'alert': ' class="alert"', 'check': ' class="check"', 'cross': ' class="cross"'}.get(cls, '')
     return f'<ul{c}>\n{items_html}\n</ul>'
 
+def label_table(tok):
+    """Подписывает ячейки заголовками колонок (data-label): на телефоне таблица
+    раскладывается в список «подпись: значение» и ничего не обрезается."""
+    heads = [re.sub(r'<[^>]+>', '', h).strip() for h in re.findall(r'<th[^>]*>(.*?)</th>', tok, flags=re.S)]
+    if not heads:
+        return tok
+    def row(m):
+        i = [0]
+        def cell(c):
+            label = heads[i[0]] if i[0] < len(heads) else ''
+            i[0] += 1
+            return f'<td data-label="{html.escape(label, quote=True)}"'
+        return re.sub(r'<td', lambda c: cell(c), m.group(0))
+    body = re.search(r'<tbody>.*?</tbody>', tok, flags=re.S)
+    if not body:
+        return tok
+    labeled = re.sub(r'<tr[^>]*>.*?</tr>', row, body.group(0), flags=re.S)
+    return tok[:body.start()] + labeled + tok[body.end():]
+
 def transform_body(raw):
     """raw: содержимое между первым .article-text и .article-cta (старая разметка)."""
     raw = raw.replace('<div class="article-text">', '').replace('</div>', '')
@@ -371,7 +390,7 @@ def transform_body(raw):
         if tok.startswith('<table'):
             flush()
             tok = re.sub(r'<table class="article-table">', '<table>', tok)
-            out.append('<div class="table-wrap">\n' + tok.strip() + '\n</div>')
+            out.append('<div class="table-wrap">\n' + label_table(tok.strip()) + '\n</div>')
             continue
         if tok.startswith('<p class="section-note"'):
             flush()

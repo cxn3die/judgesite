@@ -412,6 +412,17 @@ body.menu-open .mobile-menu{display:block;}
 .prose .table-note{font-size:var(--t-sm);color:var(--muted);margin:-1.2em 0 1.8em;}
 .prose .table-wrap{overflow-x:auto;margin:1.4em 0 1.8em;}
 .prose .table-wrap table{min-width:520px;}
+/* На телефоне таблица раскладывается в список: подпись колонки над значением, без горизонтальной прокрутки */
+@media (max-width:640px){
+  .prose .table-wrap{overflow:visible;}
+  .prose .table-wrap table{min-width:0;display:block;border-top:1px solid var(--line);}
+  .prose .table-wrap thead{display:none;}
+  .prose .table-wrap tbody,.prose .table-wrap tr,.prose .table-wrap td{display:block;width:100%;box-sizing:border-box;}
+  .prose .table-wrap tr{padding:12px 0 14px;border-bottom:1px solid var(--line);}
+  .prose .table-wrap td{border:0;padding:4px 0;}
+  .prose .table-wrap td::before{content:attr(data-label);display:block;font-size:0.75rem;color:var(--gold-700);margin-bottom:2px;}
+  .prose .table-wrap td:empty{display:none;}
+}
 .article-cta{max-width:40rem;margin-top:clamp(36px,5vw,56px);padding:24px 28px;background:var(--black);color:var(--on-dark);border-radius:var(--radius);}
 .article-cta strong{display:block;font-weight:500;font-size:1.125rem;margin-bottom:14px;letter-spacing:-0.01em;color:#fff;}
 .article-nav{max-width:40rem;display:flex;justify-content:space-between;gap:24px;margin-top:36px;padding-top:22px;border-top:1px solid var(--line);font-size:var(--t-sm);}
